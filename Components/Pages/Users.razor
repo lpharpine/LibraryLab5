@@ -1,0 +1,108 @@
+﻿@page "/users"
+@rendermode InteractiveServer
+@using Library
+@inject Library.LibraryService LibSvc
+
+<div class="container-fluid py-4">
+    <h2 class="mb-4">Manage Users</h2>
+
+    @* ── Add / Edit form ── *@
+    <div class="card mb-4">
+        <div class="card-body">
+            <h6 class="card-subtitle mb-3 text-muted">
+                @(editingId == null ? "Add a new user" : "Editing user")
+            </h6>
+            <div class="row g-2">
+                <div class="col-md-4">
+                    <input class="form-control" @bind="name" placeholder="Name" />
+                </div>
+                <div class="col-md-4">
+                    <input class="form-control" @bind="email" placeholder="Email" />
+                </div>
+                <div class="col-md-2 d-flex gap-2">
+                    <button class="btn btn-primary w-100" @onclick="Save">
+                        @(editingId == null ? "Add" : "Update")
+                    </button>
+                    @if (editingId != null)
+                    {
+                        <button class="btn btn-outline-secondary" @onclick="CancelEdit">Cancel</button>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @* ── Table ── *@
+    @if (!LibSvc.Users.Any())
+    {
+        <div class="alert alert-info">No users yet — add one above!</div>
+    }
+    else
+    {
+        <div class="card">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var user in LibSvc.Users)
+                        {
+                            <tr>
+                                <td class="text-muted">@user.Id</td>
+                                <td>@user.Name</td>
+                                <td class="text-muted">@user.Email</td>
+                                <td>
+                                    <button class="btn btn-sm btn-outline-primary me-1"
+                                            @onclick="() => StartEdit(user)">
+                                        Edit
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-danger"
+                                            @onclick="() => LibSvc.DeleteUser(user.Id)">
+                                        Delete
+                                    </button>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    string name = "", email = "";
+    int? editingId = null;
+
+    void Save()
+    {
+        if (string.IsNullOrWhiteSpace(name) || string.IsNullOrWhiteSpace(email)) return;
+
+        if (editingId == null)
+            LibSvc.AddUser(name, email);
+        else
+            LibSvc.EditUser(editingId.Value, name, email);
+
+        name = email = "";
+        editingId = null;
+    }
+
+    void StartEdit(User user)
+    {
+        editingId = user.Id;
+        name = user.Name;
+        email = user.Email;
+    }
+
+    void CancelEdit()
+    {
+        editingId = null;
+        name = email = "";
+    }
+}

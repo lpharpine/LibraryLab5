@@ -1,0 +1,77 @@
+﻿@page "/books"
+@rendermode InteractiveServer
+@using Library
+@inject Library.LibraryService LibSvc
+
+<h2>Manage Books</h2>
+
+<div style="margin-bottom:1rem">
+    <input @bind="title" placeholder="Title" />
+    <input @bind="author" placeholder="Author" />
+    <input @bind="isbn" placeholder="ISBN" />
+    <button @onclick="Save">@(editingId == null ? "Add Book" : "Update Book")</button>
+    @if (editingId != null)
+    {
+        <button @onclick="CancelEdit">Cancel</button>
+    }
+</div>
+
+@if (!LibSvc.Books.Any())
+{
+    <p>No books yet. Add one above!</p>
+}
+else
+{
+    <table>
+        <thead>
+            <tr><th>ID</th><th>Title</th><th>Author</th><th>ISBN</th><th>Actions</th></tr>
+        </thead>
+        <tbody>
+            @foreach (var book in LibSvc.Books)
+            {
+                <tr>
+                    <td>@book.Id</td>
+                    <td>@book.Title</td>
+                    <td>@book.Author</td>
+                    <td>@book.ISBN</td>
+                    <td>
+                        <button @onclick="() => StartEdit(book)">Edit</button>
+                        <button @onclick="() => LibSvc.DeleteBook(book.Id)">Delete</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    string title = "", author = "", isbn = "";
+    int? editingId = null;
+
+    void Save()
+    {
+        if (string.IsNullOrWhiteSpace(title) || string.IsNullOrWhiteSpace(author)) return;
+
+        if (editingId == null)
+            LibSvc.AddBook(title, author, isbn);
+        else
+            LibSvc.EditBook(editingId.Value, title, author, isbn);
+
+        title = author = isbn = "";
+        editingId = null;
+    }
+
+    void StartEdit(Book book)
+    {
+        editingId = book.Id;
+        title = book.Title;
+        author = book.Author;
+        isbn = book.ISBN;
+    }
+
+    void CancelEdit()
+    {
+        editingId = null;
+        title = author = isbn = "";
+    }
+}
