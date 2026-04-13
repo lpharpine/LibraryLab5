@@ -77,5 +77,49 @@ public class LibraryService
         Books.Add(book);
         return true;
     }
+
+    public LibraryService()
+    {
+        try
+        {
+            foreach (var line in File.ReadLines("Data/Books.csv"))
+            {
+                var fields = line.Split(',');
+                if (fields.Length >= 4)
+                {
+                    Books.Add(new Book
+                    {
+                        Id = int.Parse(fields[0].Trim()),
+                        Title = fields[1].Trim(),
+                        Author = fields[2].Trim(),
+                        ISBN = fields[3].Trim()
+                    });
+                }
+            }
+
+            foreach (var line in File.ReadLines("Data/Users.csv"))
+            {
+                var fields = line.Split(',');
+                if (fields.Length >= 3)
+                {
+                    Users.Add(new User
+                    {
+                        Id = int.Parse(fields[0].Trim()),
+                        Name = fields[1].Trim(),
+                        Email = fields[2].Trim()
+                    });
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Could not load seed data: {ex.Message}");
+        }
+    }
+
 }
+
+
+
+
 

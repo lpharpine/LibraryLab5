@@ -12,4 +12,18 @@
 		<None Remove="starter code\**" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <Compile Remove="Books.cs" />
+	  <Compile Remove="Users.cs" />
+	</ItemGroup>
+	
+<ItemGroup>
+    <Content Include="Data\Books.csv">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\Users.csv">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+</ItemGroup>
+
 </Project>
