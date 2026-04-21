@@ -78,8 +78,14 @@ public class LibraryService
         return true;
     }
 
-    public LibraryService()
+    // Default constructor — skips CSV loading, used by unit tests
+    public LibraryService() { }
+
+    // Constructor used by Blazor app — loads CSV data on startup
+    public LibraryService(bool loadData)
     {
+        if (!loadData) return;
+
         try
         {
             foreach (var line in File.ReadLines("Data/Books.csv"))
